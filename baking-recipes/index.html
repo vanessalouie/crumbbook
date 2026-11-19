@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Turn Instagram baking reels into clean, easy-to-follow recipe cards.">
+  <title>Crumb Book | Baking Reels to Recipes</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- Skip link: lets keyboard users jump past the nav straight to the content -->
+  <a class="skip-link" href="#main">Skip to main content</a>
+
+  <!-- ============ HEADER / NAV ============ -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="logo" href="index.html">
+        <span class="logo-icon" aria-hidden="true">📖</span>
+        Crumb Book
+      </a>
+
+      <nav aria-label="Main navigation">
+        <ul class="nav-links">
+          <li><a href="index.html" aria-current="page">Home</a></li>
+          <li><a href="recipes.html">My Recipe Box</a></li>
+          <li><a href="about.html">About</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+
+    <!-- ============ HERO ============ -->
+    <section class="hero">
+      <div class="container">
+        <h1>Turn baking reels into recipes you can actually follow</h1>
+        <p class="hero-text">
+          Paste an Instagram link and its caption, and Crumb Book tidies it into a
+          clean recipe card with ingredients and step-by-step instructions.
+        </p>
+        <a class="btn btn-primary" href="#add-recipe">Add a Recipe</a>
+      </div>
+    </section>
+
+    <!-- ============ ADD A RECIPE FORM ============ -->
+    <section class="section" id="add-recipe" aria-labelledby="add-recipe-heading">
+      <div class="container">
+        <div class="card form-card">
+          <h2 id="add-recipe-heading">Add a Recipe</h2>
+
+          <!-- novalidate: we show our own friendly error messages instead of the browser's pop-ups -->
+          <form class="recipe-form" id="recipe-form" novalidate>
+
+            <div class="form-group">
+              <label for="post-url">Instagram post or reel URL <span class="optional">(optional)</span></label>
+              <input type="url" id="post-url" name="post-url"
+                     placeholder="https://www.instagram.com/reel/..."
+                     aria-describedby="post-url-error">
+              <!-- Error message, filled in by main.js when the link is invalid -->
+              <p class="field-error" id="post-url-error" hidden></p>
+            </div>
+
+            <div class="form-group">
+              <label for="caption">Paste the caption here</label>
+              <textarea id="caption" name="caption" rows="10"
+                        aria-describedby="caption-error caption-help"
+                        placeholder="Brown Butter Chocolate Chip Cookies 🍪&#10;&#10;Ingredients:&#10;- 1 cup butter&#10;..."></textarea>
+              <p class="field-error" id="caption-error" hidden></p>
+              <p class="helper-text" id="caption-help">
+                <span aria-hidden="true">💡</span>
+                Instagram doesn't let websites read captions automatically, so copy the
+                caption from the post and paste it here.
+              </p>
+              <!-- Developer helper: fills the caption box with a test caption -->
+              <button type="button" class="link-button" id="try-sample">Try a sample</button>
+            </div>
+
+            <div class="form-group">
+              <label for="category">Category</label>
+              <!-- Options are added by main.js from RECIPE_CATEGORIES in storage.js -->
+              <select id="category" name="category"></select>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block">Extract Recipe</button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ RECIPE PREVIEW CARD ============ -->
+    <!-- Everything inside the card is filled in by main.js after "Extract Recipe" -->
+    <section class="section section-alt" id="preview" aria-labelledby="preview-heading">
+      <div class="container">
+        <!-- tabindex="-1" lets main.js move focus here after extracting -->
+        <h2 id="preview-heading" class="section-title" tabindex="-1">Your Recipe Card</h2>
+
+        <!-- Shown before any recipe has been extracted -->
+        <p class="preview-empty" id="preview-empty">
+          <span aria-hidden="true">🧁</span>
+          Your recipe card will appear here after you click <strong>Extract Recipe</strong>.
+        </p>
+
+        <!-- Success / error messages after saving -->
+        <div class="status-message" id="save-status" role="status" hidden></div>
+
+        <article class="card recipe-card" id="recipe-card" hidden>
+
+          <!-- Card top: title, tag, links, Instagram box -->
+          <div class="recipe-header">
+            <div class="recipe-meta">
+              <span class="tag" id="recipe-category"></span>
+
+              <label class="visually-hidden" for="recipe-title">Recipe title</label>
+              <!-- A textarea (not an input) so long titles wrap on phones -->
+              <textarea class="title-input" id="recipe-title" rows="1" maxlength="120"></textarea>
+              <p class="recipe-source" id="recipe-source"></p>
+
+              <div class="recipe-actions">
+                <a class="btn btn-secondary" id="recipe-link" href="#" target="_blank" rel="noopener" hidden>
+                  <span id="recipe-link-label">Full recipe</span> <span aria-hidden="true">→</span>
+                </a>
+                <!-- Only shown when no recipe was found (the embed area below is hidden then) -->
+                <a class="btn btn-secondary" id="header-instagram-link" href="#" target="_blank" rel="noopener" hidden>
+                  View on Instagram
+                </a>
+              </div>
+
+              <!-- Shown when the caption says "link in bio" but has no actual link -->
+              <p class="bio-note" id="bio-note" hidden>
+                <span aria-hidden="true">🔗</span>
+                The creator says the recipe is in their bio — open their profile to find it.
+              </p>
+            </div>
+          </div>
+
+          <!-- Shown instead of the recipe body when nothing was found -->
+          <p class="not-found" id="not-found" hidden>
+            <span aria-hidden="true">🔍</span>
+            We couldn't find a recipe in this caption. Check the comments or the creator's link,
+            then paste the recipe here.
+          </p>
+
+          <!-- Units / Servings dropdowns, built by renderRecipeTools() in render.js -->
+          <div class="recipe-tools" id="recipe-tools"></div>
+
+          <!-- Two columns on desktop, stacked on mobile.
+               With an Instagram post: post | ingredients on desktop, post on top on phones. -->
+          <div class="recipe-body" id="recipe-body">
+            <!-- Instagram post (click to load), built by renderInstagramEmbed() in render.js -->
+            <div class="ig-embed-area" id="post-area" hidden></div>
+
+            <div class="recipe-column recipe-column--ingredients">
+              <h4>Ingredients</h4>
+              <p class="tag-hint">Wrong list? Click an ingredient's tag to move it.</p>
+              <!-- Dry / Wet / Mix-in sub-sections are built by main.js -->
+              <div id="ingredient-groups"></div>
+            </div>
+
+            <div class="recipe-column recipe-column--instructions">
+              <h4>Instructions</h4>
+              <!-- Shown when the recipe is scaled (not 1×) -->
+              <p class="scale-notice" id="scale-notice" hidden></p>
+              <ol class="instruction-list" id="instruction-list"></ol>
+            </div>
+          </div>
+
+          <div class="notes-section" id="notes-section" hidden>
+            <h4>Notes</h4>
+            <ul class="notes-list" id="notes-list"></ul>
+          </div>
+
+          <div class="recipe-footer" id="recipe-footer">
+            <!-- Inline "update instead?" question when the post is already saved -->
+            <div class="confirm-box" id="duplicate-confirm" hidden>
+              <p id="duplicate-message"></p>
+              <div class="confirm-buttons">
+                <button type="button" class="btn btn-primary" id="duplicate-yes">Yes, update it</button>
+                <button type="button" class="btn btn-secondary" id="duplicate-no">No, keep the old one</button>
+              </div>
+            </div>
+
+            <button type="button" class="btn btn-primary" id="save-button">
+              <span aria-hidden="true">📥</span> Save to Recipe Box
+            </button>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- ============ HOW IT WORKS ============ -->
+    <section class="section" aria-labelledby="how-heading">
+      <div class="container">
+        <h2 id="how-heading" class="section-title">How it works</h2>
+
+        <ol class="steps">
+          <li class="step card">
+            <span class="step-icon" aria-hidden="true">🔗</span>
+            <h3>1. Copy the link</h3>
+            <p>Find a baking reel you love and copy its Instagram link.</p>
+          </li>
+          <li class="step card">
+            <span class="step-icon" aria-hidden="true">📋</span>
+            <h3>2. Paste the caption</h3>
+            <p>Copy the caption from the post and paste it into the form.</p>
+          </li>
+          <li class="step card">
+            <span class="step-icon" aria-hidden="true">🧁</span>
+            <h3>3. Bake &amp; save</h3>
+            <p>Get a clean recipe card and save it to your Recipe Box.</p>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="site-footer">
+    <div class="container">
+      <!-- TODO: replace with your name and class -->
+      <p>&copy; 2026 Vanessa &middot; ITM &amp; 325</p>
+      <p class="footer-note">Made with butter, sugar, and vanilla JavaScript.</p>
+    </div>
+  </footer>
+
+  <!-- These must load first, in this order, because main.js uses their functions -->
+  <script src="js/storage.js"></script>
+  <script src="js/convert.js"></script>
+  <script src="js/render.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

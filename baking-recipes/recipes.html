@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Your saved baking recipes from Instagram reels.">
+  <title>My Recipe Box | Crumb Book</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <a class="skip-link" href="#main">Skip to main content</a>
+
+  <!-- ============ HEADER / NAV (same on every page) ============ -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="logo" href="index.html">
+        <span class="logo-icon" aria-hidden="true">📖</span>
+        Crumb Book
+      </a>
+
+      <nav aria-label="Main navigation">
+        <ul class="nav-links">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="recipes.html" aria-current="page">My Recipe Box</a></li>
+          <li><a href="about.html">About</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+
+    <!-- ============ PAGE HEADER ============ -->
+    <section class="page-header">
+      <div class="container">
+        <h1>My Recipe Box</h1>
+        <!-- Filled in by recipes.js, e.g. "12 recipes saved" -->
+        <p class="recipe-count" id="recipe-count" aria-live="polite"></p>
+      </div>
+    </section>
+
+    <section class="section box-section" aria-label="Saved recipes">
+      <div class="container">
+
+        <!-- ============ TOOLBAR ============ -->
+        <div class="toolbar" id="toolbar">
+          <div class="toolbar-row">
+            <div class="search-field">
+              <label class="visually-hidden" for="search">Search recipes or ingredients</label>
+              <span class="search-icon" aria-hidden="true">🔍</span>
+              <input type="search" id="search" placeholder="Search recipes or ingredients…" autocomplete="off">
+            </div>
+
+            <!-- aria-pressed tells screen readers whether the toggle is on -->
+            <button type="button" class="toggle-button" id="favorites-toggle" aria-pressed="false">
+              <span aria-hidden="true">★</span> Favorites only
+            </button>
+
+            <div class="sort-field">
+              <label for="sort">Sort</label>
+              <select id="sort">
+                <option value="newest">Newest first</option>
+                <option value="oldest">Oldest first</option>
+                <option value="az">A–Z</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Category chips are added by recipes.js from RECIPE_CATEGORIES -->
+          <div class="chip-list" id="category-chips" role="group" aria-label="Filter by category"></div>
+        </div>
+
+        <!-- Short messages like "Couldn't save your favorite" -->
+        <p class="box-message" id="box-message" role="status" hidden></p>
+
+        <!-- ============ RECIPE GRID ============ -->
+        <!-- Cards are built by recipes.js -->
+        <div class="recipe-grid" id="recipe-grid"></div>
+
+        <!-- ============ NO MATCHES (filters hide everything) ============ -->
+        <div class="no-results" id="no-results" hidden>
+          <span class="empty-icon" aria-hidden="true">🔍</span>
+          <p>No recipes match your search.</p>
+          <button type="button" class="btn btn-secondary" id="clear-filters">Clear filters</button>
+        </div>
+
+        <!-- ============ EMPTY STATE ============ -->
+        <div class="empty-state" id="empty-state" hidden>
+          <span class="empty-icon" aria-hidden="true">🍪</span>
+          <h2>Your recipe box is empty</h2>
+          <p>Turn a baking reel into a recipe card and save it, and it will show up here.</p>
+          <a class="btn btn-primary" href="index.html">Add your first recipe</a>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ============ RECIPE DETAIL VIEW ============ -->
+  <!-- Native <dialog>: showModal() dims the page, traps keyboard focus inside,
+       and closes on Esc for free. recipes.js fills in #dialog-content. -->
+  <dialog class="recipe-dialog" id="recipe-dialog" aria-labelledby="dialog-title">
+    <button type="button" class="dialog-close" id="dialog-close" aria-label="Close recipe">✕</button>
+    <div class="dialog-content" id="dialog-content"></div>
+  </dialog>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="site-footer">
+    <div class="container">
+      <!-- TODO: replace with your name and class -->
+      <p>&copy; 2026 Vanessa &middot; ITM &amp; 325</p>
+      <p class="footer-note">Made with butter, sugar, and vanilla JavaScript.</p>
+    </div>
+  </footer>
+
+  <!-- These must load first, in this order, because recipes.js uses their functions -->
+  <script src="js/storage.js"></script>
+  <script src="js/convert.js"></script>
+  <script src="js/render.js"></script>
+  <script src="js/recipes.js"></script>
+</body>
+</html>
